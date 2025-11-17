@@ -18,6 +18,7 @@ import { TablesService } from '../tables/tables.service';
 import { ProductsService } from '../products/products.service';
 import { QrCodesService } from '../qr-codes/qr-codes.service';
 import { User } from '../users/entities/user.entity';
+import { OrdersGateway } from './orders.gateway';
 import { TableStatus } from '../../common/enums/table-status.enum';
 
 @Injectable()
@@ -30,6 +31,7 @@ export class OrdersService {
     private readonly tablesService: TablesService,
     private readonly productsService: ProductsService,
     private readonly qrCodesService: QrCodesService,
+    private readonly ordersGateway: OrdersGateway,
   ) {}
 
   // Crear pedido desde camarero o admin
@@ -71,15 +73,18 @@ export class OrdersService {
     });
 
     const savedOrder = await this.orderRepository.save(order);
-
-    // Marcar mesa como ocupada
     await this.tablesService.occupyTable(tableId);
-
-    return await this.findOne(savedOrder.id);
+    
+    const fullOrder = await this.findOne(savedOrder.id);
+    
+    // AGREGAR: Notificar por WebSocket
+    this.ordersGateway.notifyNewOrder(fullOrder);
+    
+    return fullOrder;
   }
 
   // Crear pedido desde QR (cliente sin autenticación)
-  async createOrderFromQr(
+   async createOrderFromQr(
     createOrderFromQrDto: CreateOrderFromQrDto,
   ): Promise<Order> {
     const { qrCode, items, notes, customerName } = createOrderFromQrDto;
@@ -114,12 +119,15 @@ export class OrdersService {
       estimatedTime,
     });
 
-    const savedOrder = await this.orderRepository.save(order);
-
-    // Marcar mesa como ocupada
+     const savedOrder = await this.orderRepository.save(order);
     await this.tablesService.occupyTable(qrCodeEntity.table.id);
-
-    return await this.findOne(savedOrder.id);
+    
+    const fullOrder = await this.findOne(savedOrder.id);
+    
+    // AGREGAR: Notificar por WebSocket
+    this.ordersGateway.notifyNewOrder(fullOrder);
+    
+    return fullOrder;
   }
 
   // Obtener todos los pedidos con filtros
@@ -217,12 +225,13 @@ export class OrdersService {
     return order;
   }
   // Actualizar estado del pedido
-  async updateStatus(
+    async updateStatus(
     id: string,
     updateStatusDto: UpdateOrderStatusDto,
   ): Promise<Order> {
     const order = await this.findOne(id);
     const { status, notes } = updateStatusDto;
+    const updatedOrder = await this.orderRepository.save(order);
 
     // Validar transiciones de estado
     this.validateStatusTransition(order.status, status);
@@ -244,12 +253,15 @@ export class OrdersService {
     }
 
     // Si el pedido se cancela, liberar la mesa
-    if (status === OrderStatus.CANCELLED) {
-      await this.checkAndReleaseTable(order.table.id);
+   if (status === OrderStatus.CANCELLED) {
+      this.ordersGateway.notifyOrderCancelled(updatedOrder);
+    } else {
+      this.ordersGateway.notifyOrderStatusUpdate(updatedOrder);
     }
-
-    return await this.orderRepository.save(order);
+    
+    return updatedOrder;
   }
+
 
   // Confirmar pedido (Admin/Camarero)
   async confirmOrder(id: string): Promise<Order> {

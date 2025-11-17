@@ -1,98 +1,301 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🍕 El Tito Pizzería - Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sistema de gestión de pedidos para restaurante con soporte para pedidos QR, gestión de personal y cocina en tiempo real.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Características
 
-## Description
+- 🔐 **Autenticación JWT** con roles (Admin, Cocina, Camarero)
+- 📱 **Pedidos desde QR** sin necesidad de registro
+- 👨‍💼 **Gestión de personal** con permisos diferenciados
+- 🍕 **Catálogo de productos** con categorías y disponibilidad
+- 🪑 **Gestión de mesas** con estados y QR dinámicos
+- 📊 **Dashboard en tiempo real** con estadísticas
+- 🔔 **Notificaciones WebSocket** para actualizaciones instantáneas
+- 📈 **Reportes y métricas** de ventas y productos
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠️ Tecnologías
 
-## Project setup
+- **NestJS** - Framework backend
+- **PostgreSQL** - Base de datos
+- **TypeORM** - ORM
+- **JWT** - Autenticación
+- **Socket.io** - WebSockets para tiempo real
+- **QRCode** - Generación de códigos QR
 
+## 🚀 Instalación
+
+### Prerrequisitos
+
+- Node.js >= 18
+- PostgreSQL >= 14
+- npm o yarn
+
+### Pasos
+
+1. **Clonar el repositorio**
 ```bash
-$ npm install
+git clone <tu-repo>
+cd el-tito-pizzeria-backend
 ```
 
-## Compile and run the project
-
+2. **Instalar dependencias**
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
+3. **Configurar variables de entorno**
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+Edita `.env` con tus configuraciones:
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password
+DB_DATABASE=el_tito_pizzeria
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+# JWT
+JWT_SECRET=tu_super_secreto_cambiar_en_produccion
+JWT_EXPIRATION=7d
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# App
+PORT=3000
+NODE_ENV=development
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Frontend URL (para CORS)
+FRONTEND_URL=http://localhost:5173
+
+# QR Codes
+QR_BASE_URL=http://localhost:5173/mesa
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. **Crear la base de datos**
+```bash
+psql -U postgres
+CREATE DATABASE el_tito_pizzeria;
+\q
+```
 
-## Resources
+5. **Ejecutar migraciones y seeds**
+```bash
+npm run seed
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+6. **Iniciar el servidor**
+```bash
+# Desarrollo
+npm run start:dev
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Producción
+npm run build
+npm run start:prod
+```
 
-## Support
+## 👥 Usuarios de Prueba
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Después de ejecutar los seeds, tendrás estos usuarios:
 
-## Stay in touch
+### Administrador
+- **Email:** admin@eltito.com
+- **Password:** Admin123!
+- **Permisos:** Acceso completo al sistema
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Jefe de Cocina
+- **Email:** cocina@eltito.com
+- **Password:** Cocina123!
+- **Permisos:** Gestión de pedidos y productos
 
-## License
+### Camarero
+- **Email:** camarero1@eltito.com
+- **Password:** Camarero123!
+- **Permisos:** Crear y gestionar pedidos
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+⚠️ **Importante:** Cambia estas contraseñas en producción.
+
+## 📡 API Endpoints
+
+### Autenticación
+- `POST /api/auth/register` - Registrar usuario
+- `POST /api/auth/login` - Iniciar sesión
+- `GET /api/auth/me` - Obtener perfil (requiere auth)
+
+### Usuarios (Admin)
+- `GET /api/users` - Listar usuarios
+- `POST /api/users` - Crear usuario
+- `PATCH /api/users/:id` - Actualizar usuario
+- `DELETE /api/users/:id` - Eliminar usuario
+
+### Mesas (Auth)
+- `GET /api/tables` - Listar mesas
+- `POST /api/tables` - Crear mesa (Admin)
+- `PATCH /api/tables/:id` - Actualizar mesa (Admin)
+- `POST /api/tables/:id/occupy` - Ocupar mesa
+- `POST /api/tables/:id/release` - Liberar mesa
+
+### Códigos QR (Admin)
+- `GET /api/qr-codes` - Listar QRs
+- `POST /api/qr-codes/generate/table/:id` - Generar QR para mesa
+- `POST /api/qr-codes/generate/all` - Generar QRs para todas
+- `POST /api/qr-codes/renew/all` - Renovar todos los QRs
+- `GET /api/qr-codes/validate/:code` - Validar QR (público)
+
+### Productos (Mixto)
+- `GET /api/products/menu` - Obtener menú (público)
+- `GET /api/products/available` - Productos disponibles (público)
+- `GET /api/products/search?q=pizza` - Buscar productos (público)
+- `POST /api/products` - Crear producto (Admin)
+- `PATCH /api/products/:id` - Actualizar producto (Admin)
+
+### Categorías (Admin)
+- `GET /api/products/categories` - Listar categorías
+- `POST /api/products/categories` - Crear categoría
+- `PATCH /api/products/categories/:id` - Actualizar categoría
+
+### Pedidos
+- `POST /api/orders/from-qr` - Crear pedido desde QR (público)
+- `GET /api/orders/track/:orderNumber` - Rastrear pedido (público)
+- `POST /api/orders` - Crear pedido (Auth)
+- `GET /api/orders` - Listar pedidos (Auth)
+- `GET /api/orders/active` - Pedidos activos (Auth)
+- `GET /api/orders/dashboard` - Dashboard (Admin/Cocina)
+- `POST /api/orders/:id/confirm` - Confirmar pedido (Admin/Camarero)
+- `POST /api/orders/:id/start-preparing` - Iniciar preparación (Cocina)
+- `POST /api/orders/:id/ready` - Marcar listo (Cocina)
+- `POST /api/orders/:id/delivered` - Marcar entregado (Camarero)
+- `POST /api/orders/:id/cancel` - Cancelar pedido (Admin/Camarero)
+
+## 🔌 WebSockets
+
+### Conexión
+```javascript
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:3000/orders');
+```
+
+### Eventos disponibles
+
+**Suscribirse a una sala:**
+```javascript
+socket.emit('subscribe', { room: 'kitchen' });
+// Salas: 'kitchen', 'waiters', 'admin', 'table:ID'
+```
+
+**Escuchar eventos:**
+```javascript
+// Nuevo pedido
+socket.on('order:new', (data) => {
+  console.log('Nuevo pedido:', data.order);
+});
+
+// Actualización de estado
+socket.on('order:updated', (data) => {
+  console.log('Pedido actualizado:', data.order);
+});
+
+// Pedido listo
+socket.on('order:ready', (data) => {
+  console.log('Pedido listo:', data.order);
+});
+
+// Pedido cancelado
+socket.on('order:cancelled', (data) => {
+  console.log('Pedido cancelado:', data.order);
+});
+```
+
+## 📊 Estructura del Proyecto
+
+```
+src/
+├── common/               # Utilidades compartidas
+│   ├── decorators/      # Decoradores personalizados
+│   ├── enums/          # Enumeraciones
+│   └── guards/         # Guards de autenticación
+├── config/              # Configuraciones
+├── database/            # Migraciones y seeds
+└── modules/             # Módulos de la aplicación
+    ├── auth/           # Autenticación
+    ├── users/          # Gestión de usuarios
+    ├── tables/         # Gestión de mesas
+    ├── qr-codes/       # Códigos QR
+    ├── products/       # Productos y categorías
+    └── orders/         # Pedidos y WebSockets
+```
+
+## 🔒 Roles y Permisos
+
+### Admin
+- Gestión completa de usuarios
+- Gestión de mesas
+- Generación y renovación de QRs
+- Gestión de productos y categorías
+- Ver todas las estadísticas
+- Confirmar y cancelar pedidos
+
+### Kitchen Manager (Cocina)
+- Ver pedidos activos
+- Cambiar estado de pedidos (preparando, listo)
+- Ver estadísticas de cocina
+- Cambiar disponibilidad de productos
+
+### Waiter (Camarero)
+- Crear pedidos manualmente
+- Confirmar pedidos
+- Marcar pedidos como entregados
+- Gestionar estados de mesas
+- Cancelar pedidos
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+## 📦 Scripts Disponibles
+
+```bash
+npm run start:dev      # Desarrollo con hot-reload
+npm run build          # Compilar para producción
+npm run start:prod     # Ejecutar en producción
+npm run seed           # Ejecutar seeds
+npm run lint           # Linter
+npm run format         # Formatear código
+```
+
+## 🚀 Despliegue
+
+### Variables de entorno en producción
+
+Asegúrate de configurar:
+- `NODE_ENV=production`
+- `DB_*` con credenciales seguras
+- `JWT_SECRET` con un secreto fuerte
+- `FRONTEND_URL` con la URL de tu frontend
+
+### Recomendaciones
+
+1. Usa SSL para PostgreSQL
+2. Configura CORS correctamente
+3. Implementa rate limiting
+4. Usa helmet para seguridad
+5. Configura logs con winston
+6. Implementa health checks
+
+## 📝 Licencia
+
+MIT
+
+## 👥 Autor
+
+Tu Nombre - [Tu GitHub](https://github.com/tu-usuario)
