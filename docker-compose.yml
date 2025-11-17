@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: el-tito-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: el_tito_pizzeria
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - el-tito-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Adminer - Gestor de BD (opcional, muy útil para desarrollo)
+  adminer:
+    image: adminer:latest
+    container_name: el-tito-adminer
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    networks:
+      - el-tito-network
+    depends_on:
+      - postgres
+
+  # Backend NestJS
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: el-tito-backend
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres123
+      DB_DATABASE: el_tito_pizzeria
+      
+      # JWT
+      JWT_SECRET: super_secret_jwt_key_change_in_production
+      JWT_EXPIRATION: 7d
+      
+      # App
+      PORT: 3000
+      NODE_ENV: production
+      
+      # Frontend URL (ajusta según tu configuración)
+      FRONTEND_URL: http://localhost:5173
+      
+      # QR Codes
+      QR_BASE_URL: http://localhost:5173/mesa
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./src:/app/src  # Hot reload en desarrollo
+      - /app/node_modules  # Evitar conflictos con node_modules del host
+    networks:
+      - el-tito-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "sleep 10 && npm run start:prod"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  el-tito-network:
+    driver: bridge
